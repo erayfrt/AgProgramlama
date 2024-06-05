@@ -1,0 +1,925 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 935px;
+                 background-color: #222222;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+             #loadingBar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width: 100%;
+                 height: 935px;
+                 background-color:rgba(200,200,200,0.8);
+                 -webkit-transition: all 0.5s ease;
+                 -moz-transition: all 0.5s ease;
+                 -ms-transition: all 0.5s ease;
+                 -o-transition: all 0.5s ease;
+                 transition: all 0.5s ease;
+                 opacity:1;
+             }
+
+             #bar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width:20px;
+                 height:20px;
+                 margin:auto auto auto auto;
+                 border-radius:11px;
+                 border:2px solid rgba(30,30,30,0.05);
+                 background: rgb(0, 173, 246); /* Old browsers */
+                 box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+             }
+
+             #border {
+                 position:absolute;
+                 top:10px;
+                 left:10px;
+                 width:500px;
+                 height:23px;
+                 margin:auto auto auto auto;
+                 box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+                 border-radius:10px;
+             }
+
+             #text {
+                 position:absolute;
+                 top:8px;
+                 left:530px;
+                 width:30px;
+                 height:50px;
+                 margin:auto auto auto auto;
+                 font-size:22px;
+                 color: #000000;
+             }
+
+             div.outerBorder {
+                 position:relative;
+                 top:400px;
+                 width:600px;
+                 height:44px;
+                 margin:auto auto auto auto;
+                 border:8px solid rgba(0,0,0,0.1);
+                 background: rgb(252,252,252); /* Old browsers */
+                 background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+                 background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+                 background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+                 background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+                 background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+                 border-radius:72px;
+                 box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+             }
+             
+
+             
+             #config {
+                 float: left;
+                 width: 400px;
+                 height: 600px;
+             }
+             
+
+             
+        </style>
+    
+    <style>
+        #search-container {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+        }
+        #search {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            position: relative;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+    </head>
+    
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+            <div id="loadingBar">
+              <div class="outerBorder">
+                <div id="text">0%</div>
+                <div id="border">
+                  <div id="bar"></div>
+                </div>
+              </div>
+            </div>
+        
+        
+            <div id="config"></div>
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#1f78b4", "font": {"color": "white"}, "id": "Schindler\u0027s List", "label": "Schindler\u0027s List", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Interstellar", "label": "Interstellar", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "The Pianist", "label": "The Pianist", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Kimi no na wa.", "label": "Kimi no na wa.", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "The Matrix", "label": "The Matrix", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Hamilton", "label": "Hamilton", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Cidade de Deus", "label": "Cidade de Deus", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Se7en", "label": "Se7en", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Capharna\u00fcm", "label": "Capharna\u00fcm", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Amadeus", "label": "Amadeus", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Das Boot", "label": "Das Boot", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Taxi Driver", "label": "Taxi Driver", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Gangs of Wasseypur", "label": "Gangs of Wasseypur", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "A Beautiful Mind", "label": "A Beautiful Mind", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Eskiya", "label": "Eskiya", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Det sjunde inseglet", "label": "Det sjunde inseglet", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Ah-ga-ssi", "label": "Ah-ga-ssi", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Crna macka, beli macor", "label": "Crna macka, beli macor", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Paper Moon", "label": "Paper Moon", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Le notti di Cabiria", "label": "Le notti di Cabiria", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "The Red Shoes", "label": "The Red Shoes", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "B\u00e3hubali: The Beginning", "label": "B\u00e3hubali: The Beginning", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Short Term 12", "label": "Short Term 12", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Le scaphandre et le papillon", "label": "Le scaphandre et le papillon", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "G.O.R.A.", "label": "G.O.R.A.", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Rain Man", "label": "Rain Man", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Annie Hall", "label": "Annie Hall", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Young Frankenstein", "label": "Young Frankenstein", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "8\u00bd", "label": "8\u00bd", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Knives Out", "label": "Knives Out", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Un proph\u00e8te", "label": "Un proph\u00e8te", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Boyhood", "label": "Boyhood", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Mystic River", "label": "Mystic River", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Mulholland Dr.", "label": "Mulholland Dr.", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Django Unchained", "label": "Django Unchained", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "The Lives of Others", "label": "The Lives of Others", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Jagten", "label": "Jagten", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Three Billboards Outside Ebbing, Missouri", "label": "Three Billboards Outside Ebbing, Missouri", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "The Message", "label": "The Message", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Sholay", "label": "Sholay", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Y\u00f4jinb\u00f4", "label": "Y\u00f4jinb\u00f4", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Dial M for Murder", "label": "Dial M for Murder", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "The Gold Rush", "label": "The Gold Rush", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Portrait de la jeune fille en feu", "label": "Portrait de la jeune fille en feu", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "A Wednesday", "label": "A Wednesday", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Into the Wild", "label": "Into the Wild", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "No Country for Old Men", "label": "No Country for Old Men", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Dilwale Dulhania Le Jayenge", "label": "Dilwale Dulhania Le Jayenge", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Chung Hing sam lam", "label": "Chung Hing sam lam", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#1f78b4", "font": {"color": "white"}, "id": "Ba wang bie ji", "label": "Ba wang bie ji", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Series_Title"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Steven Spielberg", "label": "Steven Spielberg", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Christopher Nolan", "label": "Christopher Nolan", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Roman Polanski", "label": "Roman Polanski", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Makoto Shinkai", "label": "Makoto Shinkai", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Lana Wachowski", "label": "Lana Wachowski", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Thomas Kail", "label": "Thomas Kail", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Fernando Meirelles", "label": "Fernando Meirelles", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "David Fincher", "label": "David Fincher", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Nadine Labaki", "label": "Nadine Labaki", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Milos Forman", "label": "Milos Forman", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Wolfgang Petersen", "label": "Wolfgang Petersen", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Martin Scorsese", "label": "Martin Scorsese", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Anurag Kashyap", "label": "Anurag Kashyap", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Ron Howard", "label": "Ron Howard", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Yavuz Turgul", "label": "Yavuz Turgul", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Ingmar Bergman", "label": "Ingmar Bergman", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Chan-wook Park", "label": "Chan-wook Park", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Emir Kusturica", "label": "Emir Kusturica", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Peter Bogdanovich", "label": "Peter Bogdanovich", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Federico Fellini", "label": "Federico Fellini", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Michael Powell", "label": "Michael Powell", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "S.S. Rajamouli", "label": "S.S. Rajamouli", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Destin Daniel Cretton", "label": "Destin Daniel Cretton", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Julian Schnabel", "label": "Julian Schnabel", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "\u00d6mer Faruk Sorak", "label": "\u00d6mer Faruk Sorak", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Barry Levinson", "label": "Barry Levinson", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Woody Allen", "label": "Woody Allen", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Mel Brooks", "label": "Mel Brooks", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Rian Johnson", "label": "Rian Johnson", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Jacques Audiard", "label": "Jacques Audiard", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Richard Linklater", "label": "Richard Linklater", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Clint Eastwood", "label": "Clint Eastwood", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "David Lynch", "label": "David Lynch", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Quentin Tarantino", "label": "Quentin Tarantino", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Florian Henckel von Donnersmarck", "label": "Florian Henckel von Donnersmarck", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Thomas Vinterberg", "label": "Thomas Vinterberg", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Martin McDonagh", "label": "Martin McDonagh", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Moustapha Akkad", "label": "Moustapha Akkad", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Ramesh Sippy", "label": "Ramesh Sippy", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Akira Kurosawa", "label": "Akira Kurosawa", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Alfred Hitchcock", "label": "Alfred Hitchcock", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Charles Chaplin", "label": "Charles Chaplin", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "C\u00e9line Sciamma", "label": "C\u00e9line Sciamma", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Neeraj Pandey", "label": "Neeraj Pandey", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Sean Penn", "label": "Sean Penn", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Ethan Coen", "label": "Ethan Coen", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Aditya Chopra", "label": "Aditya Chopra", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Kar-Wai Wong", "label": "Kar-Wai Wong", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#33a02c", "font": {"color": "white"}, "id": "Kaige Chen", "label": "Kaige Chen", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Director"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Liam Neeson", "label": "Liam Neeson", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Matthew McConaughey", "label": "Matthew McConaughey", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Adrien Brody", "label": "Adrien Brody", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Ry\u00fbnosuke Kamiki", "label": "Ry\u00fbnosuke Kamiki", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Lilly Wachowski", "label": "Lilly Wachowski", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Lin-Manuel Miranda", "label": "Lin-Manuel Miranda", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "K\u00e1tia Lund", "label": "K\u00e1tia Lund", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Morgan Freeman", "label": "Morgan Freeman", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Zain Al Rafeea", "label": "Zain Al Rafeea", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "F. Murray Abraham", "label": "F. Murray Abraham", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "J\u00fcrgen Prochnow", "label": "J\u00fcrgen Prochnow", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Robert De Niro", "label": "Robert De Niro", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Manoj Bajpayee", "label": "Manoj Bajpayee", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Russell Crowe", "label": "Russell Crowe", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Sener Sen", "label": "Sener Sen", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Max von Sydow", "label": "Max von Sydow", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Kim Min-hee", "label": "Kim Min-hee", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Bajram Severdzan", "label": "Bajram Severdzan", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Ryan O\u0027Neal", "label": "Ryan O\u0027Neal", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Giulietta Masina", "label": "Giulietta Masina", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Emeric Pressburger", "label": "Emeric Pressburger", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Prabhas", "label": "Prabhas", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Brie Larson", "label": "Brie Larson", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Laura Obiols", "label": "Laura Obiols", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Cem Yilmaz", "label": "Cem Yilmaz", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Dustin Hoffman", "label": "Dustin Hoffman", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Gene Wilder", "label": "Gene Wilder", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Marcello Mastroianni", "label": "Marcello Mastroianni", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Daniel Craig", "label": "Daniel Craig", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Tahar Rahim", "label": "Tahar Rahim", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Ellar Coltrane", "label": "Ellar Coltrane", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Naomi Watts", "label": "Naomi Watts", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Jamie Foxx", "label": "Jamie Foxx", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Ulrich M\u00fche", "label": "Ulrich M\u00fche", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Mads Mikkelsen", "label": "Mads Mikkelsen", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Frances McDormand", "label": "Frances McDormand", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Anthony Quinn", "label": "Anthony Quinn", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Sanjeev Kumar", "label": "Sanjeev Kumar", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Toshir\u00f4 Mifune", "label": "Toshir\u00f4 Mifune", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Ray Milland", "label": "Ray Milland", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "No\u00e9mie Merlant", "label": "No\u00e9mie Merlant", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Anupam Kher", "label": "Anupam Kher", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Emile Hirsch", "label": "Emile Hirsch", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Joel Coen", "label": "Joel Coen", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Shah Rukh Khan", "label": "Shah Rukh Khan", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Brigitte Lin", "label": "Brigitte Lin", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#e31a1c", "font": {"color": "white"}, "id": "Leslie Cheung", "label": "Leslie Cheung", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Star1"}, {"color": "#ff7f00", "font": {"color": "white"}, "id": "Drama", "label": "Drama", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Genre"}, {"color": "#ff7f00", "font": {"color": "white"}, "id": "Adventure", "label": "Adventure", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Genre"}, {"color": "#ff7f00", "font": {"color": "white"}, "id": "Fantasy", "label": "Fantasy", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Genre"}, {"color": "#ff7f00", "font": {"color": "white"}, "id": "Action", "label": "Action", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Genre"}, {"color": "#ff7f00", "font": {"color": "white"}, "id": "Biography", "label": "Biography", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Genre"}, {"color": "#ff7f00", "font": {"color": "white"}, "id": "Crime", "label": "Crime", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Genre"}, {"color": "#ff7f00", "font": {"color": "white"}, "id": "Mystery", "label": "Mystery", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Genre"}, {"color": "#ff7f00", "font": {"color": "white"}, "id": "Comedy", "label": "Comedy", "opacity": 0.7, "shape": "dot", "size": 15, "title": "Genre"}]);
+                  edges = new vis.DataSet([{"color": "gray", "from": "Schindler\u0027s List", "title": "Y\u00f6netmen", "to": "Steven Spielberg"}, {"color": "gray", "from": "Schindler\u0027s List", "title": "Ba\u015frol", "to": "Liam Neeson"}, {"color": "gray", "from": "Schindler\u0027s List", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Interstellar", "title": "Y\u00f6netmen", "to": "Christopher Nolan"}, {"color": "gray", "from": "Interstellar", "title": "Ba\u015frol", "to": "Matthew McConaughey"}, {"color": "gray", "from": "Interstellar", "title": "T\u00fcr", "to": "Adventure"}, {"color": "gray", "from": "The Pianist", "title": "Y\u00f6netmen", "to": "Roman Polanski"}, {"color": "gray", "from": "The Pianist", "title": "Ba\u015frol", "to": "Adrien Brody"}, {"color": "gray", "from": "The Pianist", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Kimi no na wa.", "title": "Y\u00f6netmen", "to": "Makoto Shinkai"}, {"color": "gray", "from": "Kimi no na wa.", "title": "Ba\u015frol", "to": "Ry\u00fbnosuke Kamiki"}, {"color": "gray", "from": "Kimi no na wa.", "title": "T\u00fcr", "to": "Fantasy"}, {"color": "gray", "from": "The Matrix", "title": "Y\u00f6netmen", "to": "Lana Wachowski"}, {"color": "gray", "from": "The Matrix", "title": "Ba\u015frol", "to": "Lilly Wachowski"}, {"color": "gray", "from": "The Matrix", "title": "T\u00fcr", "to": "Action"}, {"color": "gray", "from": "Hamilton", "title": "Y\u00f6netmen", "to": "Thomas Kail"}, {"color": "gray", "from": "Hamilton", "title": "Ba\u015frol", "to": "Lin-Manuel Miranda"}, {"color": "gray", "from": "Hamilton", "title": "T\u00fcr", "to": "Biography"}, {"color": "gray", "from": "Cidade de Deus", "title": "Y\u00f6netmen", "to": "Fernando Meirelles"}, {"color": "gray", "from": "Cidade de Deus", "title": "Ba\u015frol", "to": "K\u00e1tia Lund"}, {"color": "gray", "from": "Cidade de Deus", "title": "T\u00fcr", "to": "Crime"}, {"color": "gray", "from": "Se7en", "title": "Y\u00f6netmen", "to": "David Fincher"}, {"color": "gray", "from": "Se7en", "title": "Ba\u015frol", "to": "Morgan Freeman"}, {"color": "gray", "from": "Se7en", "title": "T\u00fcr", "to": "Mystery"}, {"color": "gray", "from": "Capharna\u00fcm", "title": "Y\u00f6netmen", "to": "Nadine Labaki"}, {"color": "gray", "from": "Capharna\u00fcm", "title": "Ba\u015frol", "to": "Zain Al Rafeea"}, {"color": "gray", "from": "Capharna\u00fcm", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Amadeus", "title": "Y\u00f6netmen", "to": "Milos Forman"}, {"color": "gray", "from": "Amadeus", "title": "Ba\u015frol", "to": "F. Murray Abraham"}, {"color": "gray", "from": "Amadeus", "title": "T\u00fcr", "to": "Biography"}, {"color": "gray", "from": "Das Boot", "title": "Y\u00f6netmen", "to": "Wolfgang Petersen"}, {"color": "gray", "from": "Das Boot", "title": "Ba\u015frol", "to": "J\u00fcrgen Prochnow"}, {"color": "gray", "from": "Das Boot", "title": "T\u00fcr", "to": "Adventure"}, {"color": "gray", "from": "Taxi Driver", "title": "Y\u00f6netmen", "to": "Martin Scorsese"}, {"color": "gray", "from": "Taxi Driver", "title": "Ba\u015frol", "to": "Robert De Niro"}, {"color": "gray", "from": "Taxi Driver", "title": "T\u00fcr", "to": "Crime"}, {"color": "gray", "from": "Gangs of Wasseypur", "title": "Y\u00f6netmen", "to": "Anurag Kashyap"}, {"color": "gray", "from": "Gangs of Wasseypur", "title": "Ba\u015frol", "to": "Manoj Bajpayee"}, {"color": "gray", "from": "Gangs of Wasseypur", "title": "T\u00fcr", "to": "Action"}, {"color": "gray", "from": "A Beautiful Mind", "title": "Y\u00f6netmen", "to": "Ron Howard"}, {"color": "gray", "from": "A Beautiful Mind", "title": "Ba\u015frol", "to": "Russell Crowe"}, {"color": "gray", "from": "A Beautiful Mind", "title": "T\u00fcr", "to": "Biography"}, {"color": "gray", "from": "Eskiya", "title": "Y\u00f6netmen", "to": "Yavuz Turgul"}, {"color": "gray", "from": "Eskiya", "title": "Ba\u015frol", "to": "Sener Sen"}, {"color": "gray", "from": "Eskiya", "title": "T\u00fcr", "to": "Crime"}, {"color": "gray", "from": "Det sjunde inseglet", "title": "Y\u00f6netmen", "to": "Ingmar Bergman"}, {"color": "gray", "from": "Det sjunde inseglet", "title": "Ba\u015frol", "to": "Max von Sydow"}, {"color": "gray", "from": "Det sjunde inseglet", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Ah-ga-ssi", "title": "Y\u00f6netmen", "to": "Chan-wook Park"}, {"color": "gray", "from": "Ah-ga-ssi", "title": "Ba\u015frol", "to": "Kim Min-hee"}, {"color": "gray", "from": "Ah-ga-ssi", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Crna macka, beli macor", "title": "Y\u00f6netmen", "to": "Emir Kusturica"}, {"color": "gray", "from": "Crna macka, beli macor", "title": "Ba\u015frol", "to": "Bajram Severdzan"}, {"color": "gray", "from": "Crna macka, beli macor", "title": "T\u00fcr", "to": "Comedy"}, {"color": "gray", "from": "Paper Moon", "title": "Y\u00f6netmen", "to": "Peter Bogdanovich"}, {"color": "gray", "from": "Paper Moon", "title": "Ba\u015frol", "to": "Ryan O\u0027Neal"}, {"color": "gray", "from": "Paper Moon", "title": "T\u00fcr", "to": "Comedy"}, {"color": "gray", "from": "Le notti di Cabiria", "title": "Y\u00f6netmen", "to": "Federico Fellini"}, {"color": "gray", "from": "Le notti di Cabiria", "title": "Ba\u015frol", "to": "Giulietta Masina"}, {"color": "gray", "from": "Le notti di Cabiria", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "The Red Shoes", "title": "Y\u00f6netmen", "to": "Michael Powell"}, {"color": "gray", "from": "The Red Shoes", "title": "Ba\u015frol", "to": "Emeric Pressburger"}, {"color": "gray", "from": "The Red Shoes", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "B\u00e3hubali: The Beginning", "title": "Y\u00f6netmen", "to": "S.S. Rajamouli"}, {"color": "gray", "from": "B\u00e3hubali: The Beginning", "title": "Ba\u015frol", "to": "Prabhas"}, {"color": "gray", "from": "B\u00e3hubali: The Beginning", "title": "T\u00fcr", "to": "Action"}, {"color": "gray", "from": "Short Term 12", "title": "Y\u00f6netmen", "to": "Destin Daniel Cretton"}, {"color": "gray", "from": "Short Term 12", "title": "Ba\u015frol", "to": "Brie Larson"}, {"color": "gray", "from": "Short Term 12", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Le scaphandre et le papillon", "title": "Y\u00f6netmen", "to": "Julian Schnabel"}, {"color": "gray", "from": "Le scaphandre et le papillon", "title": "Ba\u015frol", "to": "Laura Obiols"}, {"color": "gray", "from": "Le scaphandre et le papillon", "title": "T\u00fcr", "to": "Biography"}, {"color": "gray", "from": "G.O.R.A.", "title": "Y\u00f6netmen", "to": "\u00d6mer Faruk Sorak"}, {"color": "gray", "from": "G.O.R.A.", "title": "Ba\u015frol", "to": "Cem Yilmaz"}, {"color": "gray", "from": "G.O.R.A.", "title": "T\u00fcr", "to": "Adventure"}, {"color": "gray", "from": "Rain Man", "title": "Y\u00f6netmen", "to": "Barry Levinson"}, {"color": "gray", "from": "Rain Man", "title": "Ba\u015frol", "to": "Dustin Hoffman"}, {"color": "gray", "from": "Rain Man", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Annie Hall", "title": "Y\u00f6netmen", "to": "Woody Allen"}, {"color": "gray", "from": "Annie Hall", "title": "T\u00fcr", "to": "Comedy"}, {"color": "gray", "from": "Young Frankenstein", "title": "Y\u00f6netmen", "to": "Mel Brooks"}, {"color": "gray", "from": "Young Frankenstein", "title": "Ba\u015frol", "to": "Gene Wilder"}, {"color": "gray", "from": "Young Frankenstein", "title": "T\u00fcr", "to": "Comedy"}, {"color": "gray", "from": "8\u00bd", "title": "Y\u00f6netmen", "to": "Federico Fellini"}, {"color": "gray", "from": "8\u00bd", "title": "Ba\u015frol", "to": "Marcello Mastroianni"}, {"color": "gray", "from": "8\u00bd", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Knives Out", "title": "Y\u00f6netmen", "to": "Rian Johnson"}, {"color": "gray", "from": "Knives Out", "title": "Ba\u015frol", "to": "Daniel Craig"}, {"color": "gray", "from": "Knives Out", "title": "T\u00fcr", "to": "Comedy"}, {"color": "gray", "from": "Un proph\u00e8te", "title": "Y\u00f6netmen", "to": "Jacques Audiard"}, {"color": "gray", "from": "Un proph\u00e8te", "title": "Ba\u015frol", "to": "Tahar Rahim"}, {"color": "gray", "from": "Un proph\u00e8te", "title": "T\u00fcr", "to": "Crime"}, {"color": "gray", "from": "Boyhood", "title": "Y\u00f6netmen", "to": "Richard Linklater"}, {"color": "gray", "from": "Boyhood", "title": "Ba\u015frol", "to": "Ellar Coltrane"}, {"color": "gray", "from": "Boyhood", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Mystic River", "title": "Y\u00f6netmen", "to": "Clint Eastwood"}, {"color": "gray", "from": "Mystic River", "title": "Ba\u015frol", "to": "Sean Penn"}, {"color": "gray", "from": "Mystic River", "title": "T\u00fcr", "to": "Crime"}, {"color": "gray", "from": "Mulholland Dr.", "title": "Y\u00f6netmen", "to": "David Lynch"}, {"color": "gray", "from": "Mulholland Dr.", "title": "Ba\u015frol", "to": "Naomi Watts"}, {"color": "gray", "from": "Mulholland Dr.", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Django Unchained", "title": "Y\u00f6netmen", "to": "Quentin Tarantino"}, {"color": "gray", "from": "Django Unchained", "title": "Ba\u015frol", "to": "Jamie Foxx"}, {"color": "gray", "from": "Django Unchained", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "The Lives of Others", "title": "Y\u00f6netmen", "to": "Florian Henckel von Donnersmarck"}, {"color": "gray", "from": "The Lives of Others", "title": "Ba\u015frol", "to": "Ulrich M\u00fche"}, {"color": "gray", "from": "The Lives of Others", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Jagten", "title": "Y\u00f6netmen", "to": "Thomas Vinterberg"}, {"color": "gray", "from": "Jagten", "title": "Ba\u015frol", "to": "Mads Mikkelsen"}, {"color": "gray", "from": "Jagten", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Three Billboards Outside Ebbing, Missouri", "title": "Y\u00f6netmen", "to": "Martin McDonagh"}, {"color": "gray", "from": "Three Billboards Outside Ebbing, Missouri", "title": "Ba\u015frol", "to": "Frances McDormand"}, {"color": "gray", "from": "Three Billboards Outside Ebbing, Missouri", "title": "T\u00fcr", "to": "Comedy"}, {"color": "gray", "from": "The Message", "title": "Y\u00f6netmen", "to": "Moustapha Akkad"}, {"color": "gray", "from": "The Message", "title": "Ba\u015frol", "to": "Anthony Quinn"}, {"color": "gray", "from": "The Message", "title": "T\u00fcr", "to": "Biography"}, {"color": "gray", "from": "Sholay", "title": "Y\u00f6netmen", "to": "Ramesh Sippy"}, {"color": "gray", "from": "Sholay", "title": "Ba\u015frol", "to": "Sanjeev Kumar"}, {"color": "gray", "from": "Sholay", "title": "T\u00fcr", "to": "Action"}, {"color": "gray", "from": "Y\u00f4jinb\u00f4", "title": "Y\u00f6netmen", "to": "Akira Kurosawa"}, {"color": "gray", "from": "Y\u00f4jinb\u00f4", "title": "Ba\u015frol", "to": "Toshir\u00f4 Mifune"}, {"color": "gray", "from": "Y\u00f4jinb\u00f4", "title": "T\u00fcr", "to": "Action"}, {"color": "gray", "from": "Dial M for Murder", "title": "Y\u00f6netmen", "to": "Alfred Hitchcock"}, {"color": "gray", "from": "Dial M for Murder", "title": "Ba\u015frol", "to": "Ray Milland"}, {"color": "gray", "from": "Dial M for Murder", "title": "T\u00fcr", "to": "Crime"}, {"color": "gray", "from": "The Gold Rush", "title": "Y\u00f6netmen", "to": "Charles Chaplin"}, {"color": "gray", "from": "The Gold Rush", "title": "T\u00fcr", "to": "Adventure"}, {"color": "gray", "from": "Portrait de la jeune fille en feu", "title": "Y\u00f6netmen", "to": "C\u00e9line Sciamma"}, {"color": "gray", "from": "Portrait de la jeune fille en feu", "title": "Ba\u015frol", "to": "No\u00e9mie Merlant"}, {"color": "gray", "from": "Portrait de la jeune fille en feu", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "A Wednesday", "title": "Y\u00f6netmen", "to": "Neeraj Pandey"}, {"color": "gray", "from": "A Wednesday", "title": "Ba\u015frol", "to": "Anupam Kher"}, {"color": "gray", "from": "A Wednesday", "title": "T\u00fcr", "to": "Action"}, {"color": "gray", "from": "Into the Wild", "title": "Y\u00f6netmen", "to": "Sean Penn"}, {"color": "gray", "from": "Into the Wild", "title": "Ba\u015frol", "to": "Emile Hirsch"}, {"color": "gray", "from": "Into the Wild", "title": "T\u00fcr", "to": "Adventure"}, {"color": "gray", "from": "No Country for Old Men", "title": "Y\u00f6netmen", "to": "Ethan Coen"}, {"color": "gray", "from": "No Country for Old Men", "title": "Ba\u015frol", "to": "Joel Coen"}, {"color": "gray", "from": "No Country for Old Men", "title": "T\u00fcr", "to": "Crime"}, {"color": "gray", "from": "Dilwale Dulhania Le Jayenge", "title": "Y\u00f6netmen", "to": "Aditya Chopra"}, {"color": "gray", "from": "Dilwale Dulhania Le Jayenge", "title": "Ba\u015frol", "to": "Shah Rukh Khan"}, {"color": "gray", "from": "Dilwale Dulhania Le Jayenge", "title": "T\u00fcr", "to": "Drama"}, {"color": "gray", "from": "Chung Hing sam lam", "title": "Y\u00f6netmen", "to": "Kar-Wai Wong"}, {"color": "gray", "from": "Chung Hing sam lam", "title": "Ba\u015frol", "to": "Brigitte Lin"}, {"color": "gray", "from": "Chung Hing sam lam", "title": "T\u00fcr", "to": "Comedy"}, {"color": "gray", "from": "Ba wang bie ji", "title": "Y\u00f6netmen", "to": "Kaige Chen"}, {"color": "gray", "from": "Ba wang bie ji", "title": "Ba\u015frol", "to": "Leslie Cheung"}, {"color": "gray", "from": "Ba wang bie ji", "title": "T\u00fcr", "to": "Drama"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": true,
+        "filter": [
+            "physics"
+        ]
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+                  // if this network requires displaying the configure window,
+                  // put it in its div
+                  options.configure["container"] = document.getElementById("config");
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+                      network.on("stabilizationProgress", function(params) {
+                          document.getElementById('loadingBar').removeAttribute("style");
+                          var maxWidth = 496;
+                          var minWidth = 20;
+                          var widthFactor = params.iterations/params.total;
+                          var width = Math.max(minWidth,maxWidth * widthFactor);
+                          document.getElementById('bar').style.width = width + 'px';
+                          document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+                      });
+                      network.once("stabilizationIterationsDone", function() {
+                          document.getElementById('text').innerHTML = '100%';
+                          document.getElementById('bar').style.width = '496px';
+                          document.getElementById('loadingBar').style.opacity = 0;
+                          // really clean the dom element
+                          setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+                      });
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    
+<script type="text/javascript">
+    var filmData = {};
+
+    filmData["Schindler's List"] = {
+        'Runtime': "195 min",
+        'Released_Year': "1993",
+        'Meta_score': "94.0",
+        'IMDB_Rating': "8.9",
+        'Director': "Steven Spielberg",
+        'Star1': "Liam Neeson",
+        'Genre': "Drama"
+    };
+    
+    filmData["Interstellar"] = {
+        'Runtime': "169 min",
+        'Released_Year': "2014",
+        'Meta_score': "74.0",
+        'IMDB_Rating': "8.6",
+        'Director': "Christopher Nolan",
+        'Star1': "Matthew McConaughey",
+        'Genre': "Adventure"
+    };
+    
+    filmData["The Pianist"] = {
+        'Runtime': "150 min",
+        'Released_Year': "2002",
+        'Meta_score': "85.0",
+        'IMDB_Rating': "8.5",
+        'Director': "Roman Polanski",
+        'Star1': "Adrien Brody",
+        'Genre': "Drama"
+    };
+    
+    filmData["Kimi no na wa."] = {
+        'Runtime': "106 min",
+        'Released_Year': "2016",
+        'Meta_score': "79.0",
+        'IMDB_Rating': "8.4",
+        'Director': "Makoto Shinkai",
+        'Star1': "Ryûnosuke Kamiki",
+        'Genre': "Fantasy"
+    };
+    
+    filmData["The Matrix"] = {
+        'Runtime': "136 min",
+        'Released_Year': "1999",
+        'Meta_score': "73.0",
+        'IMDB_Rating': "8.7",
+        'Director': "Lana Wachowski",
+        'Star1': "Lilly Wachowski",
+        'Genre': "Action"
+    };
+    
+    filmData["Hamilton"] = {
+        'Runtime': "160 min",
+        'Released_Year': "2020",
+        'Meta_score': "90.0",
+        'IMDB_Rating': "8.6",
+        'Director': "Thomas Kail",
+        'Star1': "Lin-Manuel Miranda",
+        'Genre': "Biography"
+    };
+    
+    filmData["Cidade de Deus"] = {
+        'Runtime': "130 min",
+        'Released_Year': "2002",
+        'Meta_score': "79.0",
+        'IMDB_Rating': "8.6",
+        'Director': "Fernando Meirelles",
+        'Star1': "Kátia Lund",
+        'Genre': "Crime"
+    };
+    
+    filmData["Se7en"] = {
+        'Runtime': "127 min",
+        'Released_Year': "1995",
+        'Meta_score': "65.0",
+        'IMDB_Rating': "8.6",
+        'Director': "David Fincher",
+        'Star1': "Morgan Freeman",
+        'Genre': "Mystery"
+    };
+    
+    filmData["Capharnaüm"] = {
+        'Runtime': "126 min",
+        'Released_Year': "2018",
+        'Meta_score': "75.0",
+        'IMDB_Rating': "8.4",
+        'Director': "Nadine Labaki",
+        'Star1': "Zain Al Rafeea",
+        'Genre': "Drama"
+    };
+    
+    filmData["Amadeus"] = {
+        'Runtime': "160 min",
+        'Released_Year': "1984",
+        'Meta_score': "88.0",
+        'IMDB_Rating': "8.3",
+        'Director': "Milos Forman",
+        'Star1': "F. Murray Abraham",
+        'Genre': "Biography"
+    };
+    
+    filmData["Das Boot"] = {
+        'Runtime': "149 min",
+        'Released_Year': "1981",
+        'Meta_score': "86.0",
+        'IMDB_Rating': "8.3",
+        'Director': "Wolfgang Petersen",
+        'Star1': "Jürgen Prochnow",
+        'Genre': "Adventure"
+    };
+    
+    filmData["Taxi Driver"] = {
+        'Runtime': "114 min",
+        'Released_Year': "1976",
+        'Meta_score': "94.0",
+        'IMDB_Rating': "8.3",
+        'Director': "Martin Scorsese",
+        'Star1': "Robert De Niro",
+        'Genre': "Crime"
+    };
+    
+    filmData["Gangs of Wasseypur"] = {
+        'Runtime': "321 min",
+        'Released_Year': "2012",
+        'Meta_score': "89.0",
+        'IMDB_Rating': "8.2",
+        'Director': "Anurag Kashyap",
+        'Star1': "Manoj Bajpayee",
+        'Genre': "Action"
+    };
+    
+    filmData["A Beautiful Mind"] = {
+        'Runtime': "135 min",
+        'Released_Year': "2001",
+        'Meta_score': "72.0",
+        'IMDB_Rating': "8.2",
+        'Director': "Ron Howard",
+        'Star1': "Russell Crowe",
+        'Genre': "Biography"
+    };
+    
+    filmData["Eskiya"] = {
+        'Runtime': "128 min",
+        'Released_Year': "1996",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.2",
+        'Director': "Yavuz Turgul",
+        'Star1': "Sener Sen",
+        'Genre': "Crime"
+    };
+    
+    filmData["Det sjunde inseglet"] = {
+        'Runtime': "96 min",
+        'Released_Year': "1957",
+        'Meta_score': "88.0",
+        'IMDB_Rating': "8.2",
+        'Director': "Ingmar Bergman",
+        'Star1': "Max von Sydow",
+        'Genre': "Drama"
+    };
+    
+    filmData["Ah-ga-ssi"] = {
+        'Runtime': "145 min",
+        'Released_Year': "2016",
+        'Meta_score': "84.0",
+        'IMDB_Rating': "8.1",
+        'Director': "Chan-wook Park",
+        'Star1': "Kim Min-hee",
+        'Genre': "Drama"
+    };
+    
+    filmData["Crna macka, beli macor"] = {
+        'Runtime': "127 min",
+        'Released_Year': "1998",
+        'Meta_score': "73.0",
+        'IMDB_Rating': "8.1",
+        'Director': "Emir Kusturica",
+        'Star1': "Bajram Severdzan",
+        'Genre': "Comedy"
+    };
+    
+    filmData["Paper Moon"] = {
+        'Runtime': "102 min",
+        'Released_Year': "1973",
+        'Meta_score': "77.0",
+        'IMDB_Rating': "8.1",
+        'Director': "Peter Bogdanovich",
+        'Star1': "Ryan O'Neal",
+        'Genre': "Comedy"
+    };
+    
+    filmData["Le notti di Cabiria"] = {
+        'Runtime': "110 min",
+        'Released_Year': "1957",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.1",
+        'Director': "Federico Fellini",
+        'Star1': "Giulietta Masina",
+        'Genre': "Drama"
+    };
+    
+    filmData["The Red Shoes"] = {
+        'Runtime': "135 min",
+        'Released_Year': "1948",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.1",
+        'Director': "Michael Powell",
+        'Star1': "Emeric Pressburger",
+        'Genre': "Drama"
+    };
+    
+    filmData["Bãhubali: The Beginning"] = {
+        'Runtime': "159 min",
+        'Released_Year': "2015",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.0",
+        'Director': "S.S. Rajamouli",
+        'Star1': "Prabhas",
+        'Genre': "Action"
+    };
+    
+    filmData["Short Term 12"] = {
+        'Runtime': "96 min",
+        'Released_Year': "2013",
+        'Meta_score': "82.0",
+        'IMDB_Rating': "8.0",
+        'Director': "Destin Daniel Cretton",
+        'Star1': "Brie Larson",
+        'Genre': "Drama"
+    };
+    
+    filmData["Le scaphandre et le papillon"] = {
+        'Runtime': "112 min",
+        'Released_Year': "2007",
+        'Meta_score': "92.0",
+        'IMDB_Rating': "8.0",
+        'Director': "Julian Schnabel",
+        'Star1': "Laura Obiols",
+        'Genre': "Biography"
+    };
+    
+    filmData["G.O.R.A."] = {
+        'Runtime': "127 min",
+        'Released_Year': "2004",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.0",
+        'Director': "Ömer Faruk Sorak",
+        'Star1': "Cem Yilmaz",
+        'Genre': "Adventure"
+    };
+    
+    filmData["Rain Man"] = {
+        'Runtime': "133 min",
+        'Released_Year': "1988",
+        'Meta_score': "65.0",
+        'IMDB_Rating': "8.0",
+        'Director': "Barry Levinson",
+        'Star1': "Dustin Hoffman",
+        'Genre': "Drama"
+    };
+    
+    filmData["Annie Hall"] = {
+        'Runtime': "93 min",
+        'Released_Year': "1977",
+        'Meta_score': "92.0",
+        'IMDB_Rating': "8.0",
+        'Director': "Woody Allen",
+        'Star1': "Woody Allen",
+        'Genre': "Comedy"
+    };
+    
+    filmData["Young Frankenstein"] = {
+        'Runtime': "106 min",
+        'Released_Year': "1974",
+        'Meta_score': "80.0",
+        'IMDB_Rating': "8.0",
+        'Director': "Mel Brooks",
+        'Star1': "Gene Wilder",
+        'Genre': "Comedy"
+    };
+    
+    filmData["8½"] = {
+        'Runtime': "138 min",
+        'Released_Year': "1963",
+        'Meta_score': "91.0",
+        'IMDB_Rating': "8.0",
+        'Director': "Federico Fellini",
+        'Star1': "Marcello Mastroianni",
+        'Genre': "Drama"
+    };
+    
+    filmData["Knives Out"] = {
+        'Runtime': "130 min",
+        'Released_Year': "2019",
+        'Meta_score': "82.0",
+        'IMDB_Rating': "7.9",
+        'Director': "Rian Johnson",
+        'Star1': "Daniel Craig",
+        'Genre': "Comedy"
+    };
+    
+    filmData["Un prophète"] = {
+        'Runtime': "155 min",
+        'Released_Year': "2009",
+        'Meta_score': "90.0",
+        'IMDB_Rating': "7.9",
+        'Director': "Jacques Audiard",
+        'Star1': "Tahar Rahim",
+        'Genre': "Crime"
+    };
+    
+    filmData["Boyhood"] = {
+        'Runtime': "165 min",
+        'Released_Year': "2014",
+        'Meta_score': "100.0",
+        'IMDB_Rating': "7.9",
+        'Director': "Richard Linklater",
+        'Star1': "Ellar Coltrane",
+        'Genre': "Drama"
+    };
+    
+    filmData["Mystic River"] = {
+        'Runtime': "138 min",
+        'Released_Year': "2003",
+        'Meta_score': "84.0",
+        'IMDB_Rating': "7.9",
+        'Director': "Clint Eastwood",
+        'Star1': "Sean Penn",
+        'Genre': "Crime"
+    };
+    
+    filmData["Mulholland Dr."] = {
+        'Runtime': "147 min",
+        'Released_Year': "2001",
+        'Meta_score': "85.0",
+        'IMDB_Rating': "7.9",
+        'Director': "David Lynch",
+        'Star1': "Naomi Watts",
+        'Genre': "Drama"
+    };
+    
+    filmData["Django Unchained"] = {
+        'Runtime': "165 min",
+        'Released_Year': "2012",
+        'Meta_score': "81.0",
+        'IMDB_Rating': "8.4",
+        'Director': "Quentin Tarantino",
+        'Star1': "Jamie Foxx",
+        'Genre': "Drama"
+    };
+    
+    filmData["The Lives of Others"] = {
+        'Runtime': "137 min",
+        'Released_Year': "2006",
+        'Meta_score': "89.0",
+        'IMDB_Rating': "8.4",
+        'Director': "Florian Henckel von Donnersmarck",
+        'Star1': "Ulrich Mühe",
+        'Genre': "Drama"
+    };
+    
+    filmData["Jagten"] = {
+        'Runtime': "115 min",
+        'Released_Year': "2012",
+        'Meta_score': "77.0",
+        'IMDB_Rating': "8.3",
+        'Director': "Thomas Vinterberg",
+        'Star1': "Mads Mikkelsen",
+        'Genre': "Drama"
+    };
+    
+    filmData["Three Billboards Outside Ebbing, Missouri"] = {
+        'Runtime': "115 min",
+        'Released_Year': "2017",
+        'Meta_score': "88.0",
+        'IMDB_Rating': "8.2",
+        'Director': "Martin McDonagh",
+        'Star1': "Frances McDormand",
+        'Genre': "Comedy"
+    };
+    
+    filmData["The Message"] = {
+        'Runtime': "177 min",
+        'Released_Year': "1976",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.2",
+        'Director': "Moustapha Akkad",
+        'Star1': "Anthony Quinn",
+        'Genre': "Biography"
+    };
+    
+    filmData["Sholay"] = {
+        'Runtime': "204 min",
+        'Released_Year': "1975",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.2",
+        'Director': "Ramesh Sippy",
+        'Star1': "Sanjeev Kumar",
+        'Genre': "Action"
+    };
+    
+    filmData["Yôjinbô"] = {
+        'Runtime': "110 min",
+        'Released_Year': "1961",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.2",
+        'Director': "Akira Kurosawa",
+        'Star1': "Toshirô Mifune",
+        'Genre': "Action"
+    };
+    
+    filmData["Dial M for Murder"] = {
+        'Runtime': "105 min",
+        'Released_Year': "1954",
+        'Meta_score': "75.0",
+        'IMDB_Rating': "8.2",
+        'Director': "Alfred Hitchcock",
+        'Star1': "Ray Milland",
+        'Genre': "Crime"
+    };
+    
+    filmData["The Gold Rush"] = {
+        'Runtime': "95 min",
+        'Released_Year': "1925",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.2",
+        'Director': "Charles Chaplin",
+        'Star1': "Charles Chaplin",
+        'Genre': "Adventure"
+    };
+    
+    filmData["Portrait de la jeune fille en feu"] = {
+        'Runtime': "122 min",
+        'Released_Year': "2019",
+        'Meta_score': "95.0",
+        'IMDB_Rating': "8.1",
+        'Director': "Céline Sciamma",
+        'Star1': "Noémie Merlant",
+        'Genre': "Drama"
+    };
+    
+    filmData["A Wednesday"] = {
+        'Runtime': "104 min",
+        'Released_Year': "2008",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.1",
+        'Director': "Neeraj Pandey",
+        'Star1': "Anupam Kher",
+        'Genre': "Action"
+    };
+    
+    filmData["Into the Wild"] = {
+        'Runtime': "148 min",
+        'Released_Year': "2007",
+        'Meta_score': "73.0",
+        'IMDB_Rating': "8.1",
+        'Director': "Sean Penn",
+        'Star1': "Emile Hirsch",
+        'Genre': "Adventure"
+    };
+    
+    filmData["No Country for Old Men"] = {
+        'Runtime': "122 min",
+        'Released_Year': "2007",
+        'Meta_score': "91.0",
+        'IMDB_Rating': "8.1",
+        'Director': "Ethan Coen",
+        'Star1': "Joel Coen",
+        'Genre': "Crime"
+    };
+    
+    filmData["Dilwale Dulhania Le Jayenge"] = {
+        'Runtime': "189 min",
+        'Released_Year': "1995",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.1",
+        'Director': "Aditya Chopra",
+        'Star1': "Shah Rukh Khan",
+        'Genre': "Drama"
+    };
+    
+    filmData["Chung Hing sam lam"] = {
+        'Runtime': "102 min",
+        'Released_Year': "1994",
+        'Meta_score': "77.0",
+        'IMDB_Rating': "8.1",
+        'Director': "Kar-Wai Wong",
+        'Star1': "Brigitte Lin",
+        'Genre': "Comedy"
+    };
+    
+    filmData["Ba wang bie ji"] = {
+        'Runtime': "171 min",
+        'Released_Year': "1993",
+        'Meta_score': "nan",
+        'IMDB_Rating': "8.1",
+        'Director': "Kaige Chen",
+        'Star1': "Leslie Cheung",
+        'Genre': "Drama"
+    };
+    
+    function getTopRecommendations(selectedGenre, selectedTitle) {
+        var recommendations = [];
+        for (var title in filmData) {
+            if (filmData[title]['Genre'] === selectedGenre && title !== selectedTitle) {
+                recommendations.push({
+                    'title': title,
+                    'rating': parseFloat(filmData[title]['IMDB_Rating'])
+                });
+            }
+        }
+        recommendations.sort(function(a, b) {
+            return b.rating - a.rating;
+        });
+        return recommendations.slice(0, 3);
+    }
+
+    network.on("click", function(params) {
+        if (params.nodes.length > 0) {
+            var nodeId = params.nodes[0];
+            if (filmData[nodeId]) {
+                var info = filmData[nodeId];
+                var details = "<span class='close'>&times;</span>";
+                details += "<h3>" + nodeId + "</h3>";
+                details += "<p><strong>Süre:</strong> " + info['Runtime'] + "</p>";
+                details += "<p><strong>Vizyon Tarihi:</strong> " + info['Released_Year'] + "</p>";
+                details += "<p><strong>Meta Skoru:</strong> " + info['Meta_score'] + "</p>";
+                details += "<p><strong>IMDB Puanı:</strong> " + info['IMDB_Rating'] + "</p>";
+                details += "<p><strong>Yönetmen:</strong> " + info['Director'] + "</p>";
+                details += "<p><strong>Başrol:</strong> " + info['Star1'] + "</p>";
+                details += "<p><strong>Tür:</strong> " + info['Genre'] + "</p>";
+
+                var recommendations = getTopRecommendations(info['Genre'], nodeId);
+                if (recommendations.length > 0) {
+                    details += "<h4>Önerilen Filmler:</h4>";
+                    details += "<ul>";
+                    recommendations.forEach(function(rec) {
+                        details += "<li>" + rec.title + " (IMDB Puanı: " + rec.rating.toFixed(1) + ")</li>";
+                    });
+                    details += "</ul>";
+                }
+
+                document.getElementById('modal-content').innerHTML = details;
+                document.getElementById('myModal').style.display = "block";
+
+                // Modali kapatma
+                document.getElementsByClassName("close")[0].onclick = function() {
+                    document.getElementById('myModal').style.display = "none";
+                }
+                window.onclick = function(event) {
+                    if (event.target == document.getElementById('myModal')) {
+                        document.getElementById('myModal').style.display = "none";
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+    <div id="search-container">
+        <input type="text" id="search" placeholder="Search...">
+    </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content" id="modal-content">
+        </div>
+    </div>
+    <script type="text/javascript">
+        document.getElementById('search').addEventListener('input', function() {
+            var term = this.value.toLowerCase();
+            var nodes = network.body.data.nodes;
+            nodes.update(nodes.get().map(function(node) {
+                if (!node.originalColor) {
+                    node.originalColor = node.color;
+                    node.originalSize = node.size;
+                    node.originalBorderWidth = node.borderWidth;
+                }
+
+                if (term && node.label.toLowerCase().includes(term)) {
+                    node.color = '#ffff00';  // Aranan terimi içeren düğümleri sarı renkle vurgula
+                    node.size = 30;  // Aranan terimi içeren düğümlerin boyutunu artır
+                    node.borderWidth = 3;  // Kenarlık genişliği ekle
+                    node.borderWidthSelected = 5;  // Seçildiğinde kenarlık genişliği artır
+                } else {
+                    node.color = node.originalColor;
+                    node.size = node.originalSize;  // Diğer düğümleri normal boyuta getir
+                    node.borderWidth = node.originalBorderWidth;  // Kenarlık genişliğini normal hale getir
+                }
+                return node;
+            }));
+        });
+
+        // Node'ların orijinal renklerini sakla
+        network.on('beforeDrawing', function() {
+            network.body.data.nodes.get().forEach(function(node) {
+                if (!node.originalColor) {
+                    node.originalColor = node.color;
+                    node.originalSize = node.size;
+                    node.originalBorderWidth = node.borderWidth;
+                }
+            });
+        });
+    </script>
+    </body>
+    
+</html>

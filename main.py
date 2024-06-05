@@ -99,7 +99,7 @@ film_info_script = '''
     var filmData = {};
 '''
 
-# Her film için bilgileri ekleyelim
+# Her film için bilgileri ekleme
 for idx, row in veri_seti.iterrows():
     film_info_script += f'''
     filmData["{row['Series_Title']}"] = {{
@@ -113,7 +113,7 @@ for idx, row in veri_seti.iterrows():
     }};
     '''
 
-# Scriptin sonunu kapatalım
+# Scriptin sonunu kapatma
 film_info_script += '''
     function getTopRecommendations(selectedGenre, selectedTitle) {
         var recommendations = [];
@@ -144,6 +144,7 @@ film_info_script += '''
                 details += "<p><strong>IMDB Puanı:</strong> " + info['IMDB_Rating'] + "</p>";
                 details += "<p><strong>Yönetmen:</strong> " + info['Director'] + "</p>";
                 details += "<p><strong>Başrol:</strong> " + info['Star1'] + "</p>";
+                details += "<p><strong>Tür:</strong> " + info['Genre'] + "</p>";
 
                 var recommendations = getTopRecommendations(info['Genre'], nodeId);
                 if (recommendations.length > 0) {
@@ -173,10 +174,10 @@ film_info_script += '''
 </script>
 '''
 
-# HTML içeriğine JavaScript kodunu ekleyelim
+
 html_content = html_content.replace('</body>', film_info_script + '</body>')
 
-# Modal HTML kodunu ekleyelim
+# Modal HTML kodu
 html_content = html_content.replace(
     '</body>',
     '''
@@ -228,8 +229,8 @@ html_content = html_content.replace(
 )
 
 # HTML içeriğini dosyaya yazma
-with open('movie_network_with_search.html', 'w', encoding='utf-8') as f:
+with open('movie50.html', 'w', encoding='utf-8') as f:
     f.write(html_content)
 
 # Oluşturulan HTML dosyasını gösterme
-webbrowser.open('movie_network_with_search.html')
+webbrowser.open('movie50.html')
